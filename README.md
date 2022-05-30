@@ -1,16 +1,5 @@
-# flut
+# budget-manager
 
-A new Flutter project.
+Helps you manage your budget and track your expenses.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Can be run online [here](https://dvvcz.github.io/budget-manager) or on your computer using ``flutter run``.
