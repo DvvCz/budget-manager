@@ -1,11 +1,11 @@
 {
-    "name": "flut",
-    "short_name": "flut",
+    "name": "Budget Manager",
+    "short_name": "budget_manager",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "An app to help manage your budget.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

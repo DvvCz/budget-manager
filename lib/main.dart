@@ -32,18 +32,26 @@ class MyHomePage extends StatefulWidget {
 	State<MyHomePage> createState() => _MyHomePageState();
 }
 
-final expenses = <String>[];
+class Expense {
+	var kind = Icons.house;
+	var name = "";
+	var perMonth = 0;
+
+	Expense(this.name);
+}
+
+final expenses = <Expense>[];
 var typingExpense = "";
 
 class _MyHomePageState extends State<MyHomePage> {
 	TextEditingController submitController = TextEditingController();
 
-	void addExpense() {
+	void modifyExpense(int? index) {
 		showDialog(
 			context: context,
 			builder: (context) {
 				return AlertDialog(
-					title: const Text("Add Expense"),
+					title: Text("${index != null ? "Modify" : "Add"} Expense"),
 					content: TextField(
 						onChanged: (val) {
 							setState(() => typingExpense = val);
@@ -69,12 +77,37 @@ class _MyHomePageState extends State<MyHomePage> {
 							),
 							onPressed: () {
 								setState(() {
-									expenses.add(typingExpense);
+									if (index != null) {
+										expenses[index].name = typingExpense;
+									} else {
+										expenses.add(Expense(typingExpense));
+									}
 								});
 								Navigator.of(context).pop();
 							},
 							child: const Text("OK"),
 						),
+					]
+				);
+			},
+		);
+	}
+
+	void editExpenseIcon(int index) {
+		showDialog(
+			context: context,
+			builder: (context) {
+				return AlertDialog(
+					actionsOverflowDirection: VerticalDirection.down,
+					title: const Text("Pick Expense Icon"),
+					actions: [
+						for (var icon in [Icons.house, Icons.face, Icons.emergency, Icons.luggage, Icons.directions_car, Icons.school, Icons.work]) IconButton(
+							icon: Icon(icon),
+							onPressed: () {
+								setState(() => expenses[index].kind = icon);
+								Navigator.pop(context);
+							}
+						)
 					]
 				);
 			},
@@ -93,18 +126,34 @@ class _MyHomePageState extends State<MyHomePage> {
 			body: Center(
 				child: ListView.separated (
 					itemCount: expenses.length,
-					separatorBuilder: (x, y) => VerticalDivider(indent: 2.0, width: 2.0, thickness: 2.0),
-					itemBuilder: (context, index) {
-						return Text(
-							expenses[index],
-							style: theme.textTheme.headline6,
-						);
-					},
+					separatorBuilder: (x, y) => const Divider(),
+					itemBuilder: (context, index) =>
+						ListTile(
+							title: Text(expenses[index].name),
+							leading: IconButton(
+								icon: Icon(expenses[index].kind),
+								onPressed: () => editExpenseIcon(index)
+							),
+							trailing: Wrap(
+								children: [
+									IconButton(
+										icon: const Icon(Icons.edit),
+										onPressed: () => modifyExpense(index),
+									),
+									IconButton(
+										icon: const Icon(Icons.delete),
+										onPressed: () => setState(() => expenses.removeAt(index)),
+									),
+								],
+							),
+							onTap: () => setState(() => expenses.removeAt(index)),
+						)
+					,
 				),
 			),
 			floatingActionButton: FloatingActionButton(
-				onPressed: addExpense,
-				tooltip: "Increment",
+				onPressed: () => modifyExpense(null),
+				tooltip: "Add Expense",
 				child: const Icon(Icons.add),
 			),
 			drawer: Drawer(
