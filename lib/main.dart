@@ -1,3 +1,4 @@
+import 'package:budget_manager/dashboard.dart';
 import "package:flutter/material.dart";
 
 void main() {
@@ -37,27 +38,43 @@ class Expense {
 	var name = "";
 	var perMonth = 0;
 
-	Expense(this.name);
+	Expense(this.name, {this.perMonth = 0});
 }
 
 final expenses = <Expense>[];
-var typingExpense = "";
 
 class _MyHomePageState extends State<MyHomePage> {
 	TextEditingController submitController = TextEditingController();
+	TextEditingController submitMoneyController = TextEditingController();
 
 	void modifyExpense(int? index) {
 		showDialog(
 			context: context,
 			builder: (context) {
+				bool exists = index != null;
+				Expense expense = exists ? expenses[index] : Expense(
+					submitController.text,
+					perMonth: int.parse(submitMoneyController.text)
+				);
+
 				return AlertDialog(
-					title: Text("${index != null ? "Modify" : "Add"} Expense"),
-					content: TextField(
-						onChanged: (val) {
-							setState(() => typingExpense = val);
-						},
-						controller: submitController,
-						decoration: const InputDecoration(hintText: "Groceries"),
+					title: Text("${exists ? "Modify" : "Add"} Expense"),
+					content: Wrap(
+						children: [
+							TextField(
+								controller: submitController,
+								decoration: InputDecoration(
+									hintText: expense.name
+								),
+							),
+							TextField(
+								controller: submitMoneyController,
+								decoration: InputDecoration(
+									hintText: expense.perMonth.toString(),
+									prefix: const Text("\$"),
+								),
+							)
+						]
 					),
 					actions: [
 						TextButton(
@@ -78,9 +95,10 @@ class _MyHomePageState extends State<MyHomePage> {
 							onPressed: () {
 								setState(() {
 									if (index != null) {
-										expenses[index].name = typingExpense;
+										expense.name = submitController.text;
+										expense.perMonth = int.tryParse(submitMoneyController.text) ?? expense.perMonth;
 									} else {
-										expenses.add(Expense(typingExpense));
+										expenses.add(expense);
 									}
 								});
 								Navigator.of(context).pop();
@@ -121,19 +139,36 @@ class _MyHomePageState extends State<MyHomePage> {
 		return Scaffold(
 			appBar: AppBar(
 				title: Text(widget.title),
+				centerTitle: true,
+				actions: [
+					Padding(
+						padding: const EdgeInsets.only(right: 20.0),
+						child: IconButton(
+							icon: const Icon(Icons.list_alt),
+							onPressed: () {
+								Navigator.push(
+									context,
+									MaterialPageRoute(builder: (context) => const ResultsRoute())
+								);
+							},
+						)
+					)
+				],
 			),
 
 			body: Center(
 				child: ListView.separated (
 					itemCount: expenses.length,
 					separatorBuilder: (x, y) => const Divider(),
-					itemBuilder: (context, index) =>
-						ListTile(
-							title: Text(expenses[index].name),
+					itemBuilder: (context, index) {
+						final expense = expenses[index];
+						return ListTile(
+							title: Text(expense.name),
 							leading: IconButton(
 								icon: Icon(expenses[index].kind),
 								onPressed: () => editExpenseIcon(index)
 							),
+							subtitle: Text("\$${expense.perMonth}"),
 							trailing: Wrap(
 								children: [
 									IconButton(
@@ -145,10 +180,9 @@ class _MyHomePageState extends State<MyHomePage> {
 										onPressed: () => setState(() => expenses.removeAt(index)),
 									),
 								],
-							),
-							onTap: () => setState(() => expenses.removeAt(index)),
-						)
-					,
+							)
+						);
+					}
 				),
 			),
 			floatingActionButton: FloatingActionButton(
