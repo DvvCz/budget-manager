@@ -1,5 +1,6 @@
 import 'package:budget_manager/dashboard.dart';
 import "package:flutter/material.dart";
+import 'package:flutter/services.dart';
 
 void main() {
 	runApp(const MyApp());
@@ -53,8 +54,8 @@ class _MyHomePageState extends State<MyHomePage> {
 			builder: (context) {
 				bool exists = index != null;
 				Expense expense = exists ? expenses[index] : Expense(
-					submitController.text,
-					perMonth: int.parse(submitMoneyController.text)
+					"Groceries",
+					perMonth: 0,
 				);
 
 				return AlertDialog(
@@ -62,12 +63,18 @@ class _MyHomePageState extends State<MyHomePage> {
 					content: Wrap(
 						children: [
 							TextField(
+								inputFormatters: [
+									FilteringTextInputFormatter.allow(RegExp("[a-zA-Z0-9 ]"))
+								],
 								controller: submitController,
 								decoration: InputDecoration(
 									hintText: expense.name
 								),
 							),
 							TextField(
+								inputFormatters: [
+									FilteringTextInputFormatter.allow(RegExp("[0-9]"))
+								],
 								controller: submitMoneyController,
 								decoration: InputDecoration(
 									hintText: expense.perMonth.toString(),
@@ -94,10 +101,10 @@ class _MyHomePageState extends State<MyHomePage> {
 							),
 							onPressed: () {
 								setState(() {
-									if (index != null) {
-										expense.name = submitController.text;
-										expense.perMonth = int.tryParse(submitMoneyController.text) ?? expense.perMonth;
-									} else {
+									expense.name = submitController.text;
+									expense.perMonth = int.tryParse(submitMoneyController.text) ?? expense.perMonth;
+
+									if (!exists) {
 										expenses.add(expense);
 									}
 								});
