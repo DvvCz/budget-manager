@@ -3,6 +3,9 @@ name: Deploy
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'lib/**'
+      - 'test/**'
 
 jobs:
   build:
